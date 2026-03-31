@@ -145,4 +145,7 @@ rel <- gran_ind |>
   geom_bar(stat = 'identity', position = 'stack')
   #geom_area(alpha=0.8, size=0.5, color='white')
 ?mean
+  
+rel
 
+df |> slice(7) #|> pull(`X.8`)
