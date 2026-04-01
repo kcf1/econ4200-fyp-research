@@ -1,0 +1,444 @@
+---
+title: "job_data"
+output: html_document
+date: "2026-04-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Packages
+
+```{r}
+# Load the package.
+library(datasets)
+library(dslabs)
+library(tidyr)
+library(stringr)
+library(dplyr)
+library(rvest)
+library(stringr)
+library(lubridate)
+library(janeaustenr)
+library(tidytext)
+library(textdata)
+library(ggplot2)
+library(latex2exp)
+```
+
+## Data Cleaning
+
+```{r}
+df <- read.csv('data/job.csv',sep = ',',na.strings = c('N.A.','[-§32]','[*1]'))
+head(df)
+
+colnames(df) <- paste0(df[2,],' - ',df[3,]) |> str_replace('^\\s{2}-\\s$','') |> paste0(df[4,])
+df |> str()
+
+df <- df[5:2270,-c(5,7,9)]
+df <- df |> mutate(ind = str_replace(`Industry section`,': .*','') |> as.factor())
+df$Year <- df$Year |> as.numeric()
+df[2:3] <- df[2:3] |> lapply(as.factor)
+df[4:7] <- df[4:7] |> lapply(as.numeric)
+head(df)
+
+df <- df |>
+  mutate(
+    Date = mdy(paste0(Month,'1, ',Year)),
+    `Vacancy rate (1) - (%)` = round(`Number of vacancies - No.`/(`Number of vacancies - No.`+`Number of persons engaged - No.`)*100,2)
+  )
+df <- df |>
+  arrange(Date)
+
+df |> str()
+
+# All industries
+all_ind <- df |>
+  filter(`Industry section` == 'All industry sections covered')
+# Grouped industries
+agg_ind <- df |>
+  filter(
+    `Industry section` %in% 
+      c('B, D & E: Mining and quarrying; and electricity and gas supply, and waste management',
+        'G: Import/export, wholesale and retail trades',
+        'M & N: Professional and business services',
+        'P - S: Social and personal services'
+        )
+  )
+# Granular industries without groups
+gran_ind <- df |>
+  filter(
+    `Industry section` != 'All industry sections covered' &
+    ! `Industry section` %in% 
+      c('B: Mining and quarrying',
+        'D & E: Electricity and gas supply, and waste management',
+        #'B, D & E: Mining and quarrying; and electricity and gas supply, and waste management',
+        'G: Import/export, wholesale and retail trades',
+        'M & N: Professional and business services',
+        'P - S: Social and personal services'
+        )
+  )
+```
+
+## Summary of labour market
+
+```{r}
+# Summary of labour market
+sum_lab <- gran_ind |>
+  group_by(Date) |>
+  summarise(
+    tot_est = sum(`Number of establishments - No.`),
+    tot_eng = sum(`Number of persons engaged - No.`),
+    tot_vac = sum(`Number of vacancies - No.`)
+  ) |>
+  mutate(
+    tot_lab = tot_eng + tot_vac,
+    lab_per_est = tot_lab / tot_est,
+    eng_per_est = tot_eng / tot_est,
+    vac_per_est = tot_vac / tot_est,
+    vac_rate = tot_vac / tot_lab * 100
+  )
+
+sum_lab_long <- sum_lab |>
+  pivot_longer(-Date)
+
+head(sum_lab)
+```
+
+### Establishment
+
+```{r}
+# Total establishment trend
+sum_lab_long |>
+  filter(name == 'tot_est') |>
+  ggplot(aes(x=Date,y=value)) +
+  geom_line() +
+  labs(
+    title = "Number of establishments in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of establisments"
+  ) +
+  theme_classic()
+
+# Total establishment changes
+sum_lab_long |>
+  filter(name == 'tot_est') |>
+  mutate(
+    value = value - lag(value)
+  ) |>
+  mutate(
+    updown = ifelse(value >= 0, 'Increase','Decrease')
+  ) |>
+  drop_na() |>
+  ggplot(aes(x=Date,y=value,fill=updown)) +
+  scale_fill_manual(values = c("Increase" = "chartreuse", "Decrease" = "brown1"), guide = 'none') +
+  geom_bar(stat = 'identity') +
+  labs(
+    title = "Change in number of establishments in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of establisments"
+  ) +
+  theme_classic()
+```
+
+### Engaged persons
+
+```{r}
+# Number of engagement
+sum_lab_long |>
+  filter(name == 'tot_eng') |>
+  ggplot(aes(x=Date,y=value)) +
+  geom_line() +
+  labs(
+    title = "Number of engaged persons in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons"
+  ) +
+  theme_classic()
+
+# Number of engagement changes
+sum_lab_long |>
+  filter(name == 'tot_eng') |>
+  mutate(
+    value = value - lag(value)
+  ) |>
+  mutate(
+    updown = ifelse(value >= 0, 'Increase','Decrease')
+  ) |>
+  drop_na() |>
+  ggplot(aes(x=Date,y=value,fill=updown)) +
+  scale_fill_manual(values = c("Increase" = "chartreuse", "Decrease" = "brown1"), guide = 'none') +
+  geom_bar(stat = 'identity') +
+  labs(
+    title = "Number of engaged persons in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons"
+  ) +
+  theme_classic()
+
+```
+
+### Vacancies
+
+```{r}
+# Number of vacancies
+sum_lab_long |>
+  filter(name == 'tot_vac') |>
+  ggplot(aes(x=Date,y=value)) +
+  geom_line() +
+  labs(
+    title = "Number of vacancies in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons"
+  ) +
+  theme_classic()
+
+# Number of vacancies changes
+sum_lab_long |>
+  filter(name == 'tot_vac') |>
+  mutate(
+    value = value - lag(value)
+  ) |>
+  mutate(
+    updown = ifelse(value >= 0, 'Increase','Decrease')
+  ) |>
+  drop_na() |>
+  ggplot(aes(x=Date,y=value,fill=updown)) +
+  scale_fill_manual(values = c("Increase" = "chartreuse", "Decrease" = "brown1"), guide = 'none') +
+  geom_bar(stat = 'identity') +
+  labs(
+    title = "Number of vacancies in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons"
+  ) +
+  theme_classic()
+```
+
+### Headcounts per establishment
+
+```{r}
+# Headcounts per establishment
+sum_lab_long |>
+  filter(name == 'lab_per_est') |>
+  ggplot(aes(x=Date,y=value)) +
+  geom_line() +
+  labs(
+    title = "Headcounts per establishment in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons"
+  ) +
+  theme_classic()
+
+# Headcounts per establishment changes
+sum_lab_long |>
+  filter(name == 'lab_per_est') |>
+  mutate(
+    value = value - lag(value)
+  ) |>
+  mutate(
+    updown = ifelse(value >= 0, 'Increase','Decrease')
+  ) |>
+  drop_na() |>
+  ggplot(aes(x=Date,y=value,fill=updown)) +
+  scale_fill_manual(values = c("Increase" = "chartreuse", "Decrease" = "brown1"), guide = 'none') +
+  geom_bar(stat = 'identity') +
+  labs(
+    title = "Change in headcounts per establishments in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons"
+  ) +
+  theme_classic()
+```
+
+### Engagement per establishment
+
+```{r}
+# Engagement per establishment
+sum_lab_long |>
+  filter(name == 'eng_per_est') |>
+  ggplot(aes(x=Date,y=value)) +
+  geom_line() +
+  labs(
+    title = "Engaged persons per establishment in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons"
+  ) +
+  theme_classic()
+
+# Engagement per establishment changes
+sum_lab_long |>
+  filter(name == 'eng_per_est') |>
+  mutate(
+    value = value - lag(value)
+  ) |>
+  mutate(
+    updown = ifelse(value >= 0, 'Increase','Decrease')
+  ) |>
+  drop_na() |>
+  ggplot(aes(x=Date,y=value,fill=updown)) +
+  scale_fill_manual(values = c("Increase" = "chartreuse", "Decrease" = "brown1"), guide = 'none') +
+  geom_bar(stat = 'identity') +
+  labs(
+    title = "Change in engaged person per establishments in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons"
+  ) +
+  theme_classic()
+```
+
+### Vacancies per establishment
+
+```{r}
+# Vacancies per establishment
+sum_lab_long |>
+  filter(name == 'vac_per_est') |>
+  ggplot(aes(x=Date,y=value)) +
+  geom_line() +
+  labs(
+    title = "Vacancies per establishment in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons"
+  ) +
+  theme_classic()
+
+# Engagement per establishment changes
+sum_lab_long |>
+  filter(name == 'vac_per_est') |>
+  mutate(
+    value = value - lag(value)
+  ) |>
+  mutate(
+    updown = ifelse(value >= 0, 'Increase','Decrease')
+  ) |>
+  drop_na() |>
+  ggplot(aes(x=Date,y=value,fill=updown)) +
+  scale_fill_manual(values = c("Increase" = "chartreuse", "Decrease" = "brown1"), guide = 'none') +
+  geom_bar(stat = 'identity') +
+  labs(
+    title = "Change in vacancies per establishments in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons"
+  ) +
+  theme_classic()
+```
+
+### Vacancy rate
+
+```{r}
+# Vacancy rate
+sum_lab_long |>
+  filter(name == 'vac_rate') |>
+  ggplot(aes(x=Date,y=value)) +
+  geom_line() +
+  labs(
+    title = "Vacancy rate in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "%"
+  ) +
+  theme_classic()
+```
+
+## By industry labour market
+
+```{r}
+# By industry labour market
+ind_lab <- gran_ind |>
+  group_by(Date,ind,`Industry section`) |>
+  summarise(
+    tot_est = sum(`Number of establishments - No.`),
+    tot_eng = sum(`Number of persons engaged - No.`),
+    tot_vac = sum(`Number of vacancies - No.`)
+  ) |>
+  mutate(
+    tot_lab = tot_eng + tot_vac,
+    lab_per_est = tot_lab / tot_est,
+    eng_per_est = tot_eng / tot_est,
+    vac_per_est = tot_vac / tot_est,
+    vac_rate = tot_vac / tot_lab * 100
+  )
+
+ind_lab_long <- ind_lab |>
+  pivot_longer(-c(Date,ind,`Industry section`))
+
+head(ind_lab)
+head(ind_lab_long)
+```
+
+```{r}
+ind_lab$`Industry section` |> unique()
+```
+
+### By industry establishment
+
+```{r}
+# Industry establishment trend
+ind_lab_long |>
+  filter(name == 'tot_est') |>
+  ggplot(aes(x=Date,y=value,colour=ind)) +
+  geom_line() +
+  labs(
+    title = "Number of establishments by industry",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of establisments",
+    color = 'Industry'
+  ) +
+  theme_classic()
+
+# Industry establishment changes
+ind_lab_long |>
+  filter(name == 'tot_est') |>
+  group_by(ind) |>
+  summarize(
+    change = (last(value) / first (value) - 1) * 100
+  ) |>
+  ggplot(aes(x=reorder(ind,change),y=change,fill=ind)) +
+  geom_bar(stat = 'identity') +
+  coord_flip() +
+  scale_fill_discrete(guide = 'none') +
+  labs(
+    title = "% change in number of establishments in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Industry",
+    y = "%"
+  ) +
+  theme_classic()
+
+# Industry establishment changes
+ind_lab_long |>
+  filter(name == 'tot_est') |>
+  group_by(`Industry section`) |>
+  summarize(
+    change = (last(value) / first (value) - 1) * 100
+  ) |>
+  arrange(-change)
+```

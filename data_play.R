@@ -34,9 +34,10 @@ df <- df |>
 
 df |> str()
 
-
+# All industries
 all_ind <- df |>
   filter(`Industry section` == 'All industry sections covered')
+# Grouped industries
 agg_ind <- df |>
   filter(
     `Industry section` %in% 
@@ -46,6 +47,7 @@ agg_ind <- df |>
         'P - S: Social and personal services'
         )
   )
+# Granular industries without groups
 gran_ind <- df |>
   filter(
     `Industry section` != 'All industry sections covered' &
@@ -59,51 +61,93 @@ gran_ind <- df |>
         )
   )
 
-all_eng <- gran_ind |>
+# Summary of labour market
+sum_lab <- gran_ind |>
   group_by(Date) |>
   summarise(
+    tot_est = sum(`Number of establishments - No.`),
     tot_eng = sum(`Number of persons engaged - No.`),
     tot_vac = sum(`Number of vacancies - No.`)
-  ) #|>
-  mutate(
-    tot_per = tot_eng + tot_vac
-  )
-all_eng_norm <- all_eng |>
-  mutate(
-    tot_eng = (tot_eng - first(tot_eng)) / sd(tot_eng),
-    tot_vac = (tot_vac - first(tot_vac)) / sd(tot_vac),
-    #tot_per = (tot_per - first(tot_per)) / sd(tot_per),
-    period = Date |> floor_date(unit = '10years') |> as.factor()
-  )
-
-all_eng_chg <- all_eng |>
-  mutate(
-    tot_eng = (tot_eng/lag(tot_eng))-1,
-    tot_vac = (tot_vac/lag(tot_vac))-1,
-    #tot_per = (tot_per/lag(tot_per))-1,
-    period = Date |> floor_date(unit = '10years') |> as.factor()
   ) |>
-  filter(!is.na(tot_eng)) |>
   mutate(
-    tot_eng = tot_eng/sd(tot_eng),
-    tot_vac = tot_vac/sd(tot_vac),
-    #tot_per = tot_per/sd(tot_per)
+    tot_lab = tot_eng + tot_vac,
+    lab_per_est = tot_lab / tot_est
   )
-all_eng_chg |>
-  pivot_longer(-c(Date,period), names_to = 'index', values_to = 'pct') |>
-  ggplot(aes(x=Date,y=pct,fill=index)) +
-  geom_bar(stat='identity',position='dodge')
 
-all_eng_norm |>
-  pivot_longer(-c(Date,period), names_to = 'index', values_to = 'level') |>
-  ggplot(aes(x=Date,y=level,colour=index)) +
-  geom_line()
+sum_lab_long <- sum_lab |>
+  pivot_longer(-Date)
 
-all_eng_norm |>
-  ggplot(aes(x=tot_eng,y=tot_vac,colour=period)) +
-  geom_point() +
-  geom_smooth(method='lm')
+# Total establishment trend
+sum_lab_long |>
+  filter(name == 'tot_est') |>
+  ggplot(aes(x=Date,y=value)) +
+  geom_line() +
+  labs(
+    title = "Number of establishments in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of establisments"
+  ) +
+  theme_classic()
 
+# Total establishment changes
+sum_lab_long |>
+  filter(name == 'tot_est') |>
+  mutate(
+    value = value - lag(value)
+  ) |>
+  mutate(
+    updown = ifelse(value >= 0, 'Increase','Decrease')
+  ) |>
+  drop_na() |>
+  ggplot(aes(x=Date,y=value,fill=updown)) +
+  scale_fill_manual(values = c("Increase" = "chartreuse", "Decrease" = "brown1")) +
+  geom_bar(stat = 'identity') +
+  labs(
+    title = "Change in number of establishments in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of establisments"
+  ) +
+  theme_classic()
+
+# Headcounts per establishment
+sum_lab_long |>
+  filter(name == 'lab_per_est') |>
+  ggplot(aes(x=Date,y=value)) +
+  geom_line() +
+  labs(
+    title = "Headcounts per establishment in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of headcounts"
+  ) +
+  theme_classic()
+
+# Headcounts per establishment changes
+sum_lab_long |>
+  filter(name == 'lab_per_est') |>
+  mutate(
+    value = value - lag(value)
+  ) |>
+  mutate(
+    updown = ifelse(value >= 0, 'Increase','Decrease')
+  ) |>
+  drop_na() |>
+  ggplot(aes(x=Date,y=value,fill=updown)) +
+  scale_fill_manual(values = c("Increase" = "chartreuse", "Decrease" = "brown1")) +
+  geom_bar(stat = 'identity') +
+  labs(
+    title = "Change in headcounts per establishments in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of Establisments"
+  ) +
+  theme_classic()
 
 shares <- gran_ind |> 
   group_by(Date) |>
