@@ -25,6 +25,7 @@ library(tidytext)
 library(textdata)
 library(ggplot2)
 library(latex2exp)
+library(knitr)
 ```
 
 ## Data Cleaning
@@ -37,7 +38,10 @@ colnames(df) <- paste0(df[2,],' - ',df[3,]) |> str_replace('^\\s{2}-\\s$','') |>
 df |> str()
 
 df <- df[5:2270,-c(5,7,9)]
-df <- df |> mutate(ind = str_replace(`Industry section`,': .*','') |> as.factor())
+df <- df |> mutate(
+  ind_des = str_trunc(`Industry section`,70) |> as.factor(),
+  ind = str_replace(`Industry section`,': .*','') |> as.factor()
+  )
 df$Year <- df$Year |> as.numeric()
 df[2:3] <- df[2:3] |> lapply(as.factor)
 df[4:7] <- df[4:7] |> lapply(as.numeric)
@@ -363,6 +367,28 @@ sum_lab_long |>
     y = "%"
   ) +
   theme_classic()
+
+# Vacancy rate changes
+sum_lab_long |>
+  filter(name == 'vac_rate') |>
+  mutate(
+    value = value - lag(value)
+  ) |>
+  mutate(
+    updown = ifelse(value >= 0, 'Increase','Decrease')
+  ) |>
+  drop_na() |>
+  ggplot(aes(x=Date,y=value,fill=updown)) +
+  scale_fill_manual(values = c("Increase" = "chartreuse", "Decrease" = "brown1"), guide = 'none') +
+  geom_bar(stat = 'identity') +
+  labs(
+    title = "Change in vacancy rate per establishments in all industries",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "%"
+  ) +
+  theme_classic()
 ```
 
 ## By industry labour market
@@ -370,7 +396,7 @@ sum_lab_long |>
 ```{r}
 # By industry labour market
 ind_lab <- gran_ind |>
-  group_by(Date,ind,`Industry section`) |>
+  group_by(Date,ind,ind_des) |>
   summarise(
     tot_est = sum(`Number of establishments - No.`),
     tot_eng = sum(`Number of persons engaged - No.`),
@@ -385,17 +411,17 @@ ind_lab <- gran_ind |>
   )
 
 ind_lab_long <- ind_lab |>
-  pivot_longer(-c(Date,ind,`Industry section`))
+  pivot_longer(-c(Date,ind,ind_des))
 
 head(ind_lab)
 head(ind_lab_long)
 ```
 
 ```{r}
-ind_lab$`Industry section` |> unique()
+ind_lab |> group_by(ind) |> summarise(des = first(ind_des))
 ```
 
-### By industry establishment
+### Establishment
 
 ```{r}
 # Industry establishment trend
@@ -425,7 +451,7 @@ ind_lab_long |>
   coord_flip() +
   scale_fill_discrete(guide = 'none') +
   labs(
-    title = "% change in number of establishments in all industries",
+    title = "% change in number of establishments by industry",
     subtitle = "(2000 - 2026)",
     caption = "Data from CSD HK",
     x = "Industry",
@@ -436,9 +462,310 @@ ind_lab_long |>
 # Industry establishment changes
 ind_lab_long |>
   filter(name == 'tot_est') |>
-  group_by(`Industry section`) |>
+  group_by(ind_des) |>
   summarize(
     change = (last(value) / first (value) - 1) * 100
   ) |>
-  arrange(-change)
+  arrange(-change) |>
+  print()
+```
+
+### Engaged persons
+
+```{r}
+# Industry engagement trend
+ind_lab_long |>
+  filter(name == 'tot_eng') |>
+  ggplot(aes(x=Date,y=value,colour=ind)) +
+  geom_line() +
+  labs(
+    title = "Number of engaged persons by industry",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons",
+    color = 'Industry'
+  ) +
+  theme_classic()
+
+# Industry engagement changes
+ind_lab_long |>
+  filter(name == 'tot_eng') |>
+  group_by(ind) |>
+  summarize(
+    change = (last(value) / first (value) - 1) * 100
+  ) |>
+  ggplot(aes(x=reorder(ind,change),y=change,fill=ind)) +
+  geom_bar(stat = 'identity') +
+  coord_flip() +
+  scale_fill_discrete(guide = 'none') +
+  labs(
+    title = "% change in number of engaged persons by industry",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Industry",
+    y = "%"
+  ) +
+  theme_classic()
+
+# Industry engagement changes
+ind_lab_long |>
+  filter(name == 'tot_eng') |>
+  group_by(ind_des) |>
+  summarize(
+    change = (last(value) / first (value) - 1) * 100
+  ) |>
+  arrange(-change) |>
+  print()
+```
+
+### Vacancies
+
+```{r}
+# Industry vacancies trend
+ind_lab_long |>
+  filter(name == 'tot_vac') |>
+  ggplot(aes(x=Date,y=value,colour=ind)) +
+  geom_line() +
+  labs(
+    title = "Number of vacancies by industry",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons",
+    color = 'Industry'
+  ) +
+  theme_classic()
+
+# Industry vacancies changes
+ind_lab_long |>
+  filter(name == 'tot_vac') |>
+  group_by(ind) |>
+  summarize(
+    change = (last(value) / first (value) - 1) * 100
+  ) |>
+  ggplot(aes(x=reorder(ind,change),y=change,fill=ind)) +
+  geom_bar(stat = 'identity') +
+  coord_flip() +
+  scale_fill_discrete(guide = 'none') +
+  labs(
+    title = "% change in number of vacancies by industry",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Industry",
+    y = "%"
+  ) +
+  theme_classic()
+
+# Industry vacancies changes
+ind_lab_long |>
+  filter(name == 'tot_vac') |>
+  group_by(ind_des) |>
+  summarize(
+    change = (last(value) / first (value) - 1) * 100
+  ) |>
+  arrange(-change) |>
+  print()
+```
+
+### Headcounts per establishment
+
+```{r}
+# Industry headcounts trend
+ind_lab_long |>
+  filter(name == 'lab_per_est') |>
+  ggplot(aes(x=Date,y=value,colour=ind)) +
+  geom_line() +
+  labs(
+    title = "Number of headcounts per establishment by industry",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons",
+    color = 'Industry'
+  ) +
+  theme_classic()
+
+# Industry headcounts changes
+ind_lab_long |>
+  filter(name == 'lab_per_est') |>
+  group_by(ind) |>
+  summarize(
+    change = (last(value) / first (value) - 1) * 100
+  ) |>
+  ggplot(aes(x=reorder(ind,change),y=change,fill=ind)) +
+  geom_bar(stat = 'identity') +
+  coord_flip() +
+  scale_fill_discrete(guide = 'none') +
+  labs(
+    title = "% change in number of headcounts per establishment by industry",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Industry",
+    y = "%"
+  ) +
+  theme_classic()
+
+# Industry headcounts changes
+ind_lab_long |>
+  filter(name == 'lab_per_est') |>
+  group_by(ind_des) |>
+  summarize(
+    change = (last(value) / first (value) - 1) * 100
+  ) |>
+  arrange(-change) |>
+  print()
+```
+
+### Engaged persons per establishment
+
+```{r}
+# Industry engagement per establishment trend
+ind_lab_long |>
+  filter(name == 'eng_per_est') |>
+  ggplot(aes(x=Date,y=value,colour=ind)) +
+  geom_line() +
+  labs(
+    title = "Number of engaged persons per establishment by industry",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons",
+    color = 'Industry'
+  ) +
+  theme_classic()
+
+# Industry engagement per establishment changes
+ind_lab_long |>
+  filter(name == 'eng_per_est') |>
+  group_by(ind) |>
+  summarize(
+    change = (last(value) / first (value) - 1) * 100
+  ) |>
+  ggplot(aes(x=reorder(ind,change),y=change,fill=ind)) +
+  geom_bar(stat = 'identity') +
+  coord_flip() +
+  scale_fill_discrete(guide = 'none') +
+  labs(
+    title = "% change in number of engaged persons per establishment by industry",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Industry",
+    y = "%"
+  ) +
+  theme_classic()
+
+# Industry engagement per establishment changes
+ind_lab_long |>
+  filter(name == 'eng_per_est') |>
+  group_by(ind_des) |>
+  summarize(
+    change = (last(value) / first (value) - 1) * 100
+  ) |>
+  arrange(-change) |>
+  print()
+```
+
+### Vacancies per establishment
+
+```{r}
+# Industry vacancies per establishment trend
+ind_lab_long |>
+  filter(name == 'vac_per_est') |>
+  ggplot(aes(x=Date,y=value,colour=ind)) +
+  geom_line() +
+  labs(
+    title = "Number of vacancies per establishment by industry",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "No of persons",
+    color = 'Industry'
+  ) +
+  theme_classic()
+
+# Industry vacancies per establishment changes
+ind_lab_long |>
+  filter(name == 'vac_per_est') |>
+  group_by(ind) |>
+  summarize(
+    change = (last(value) / first (value) - 1) * 100
+  ) |>
+  ggplot(aes(x=reorder(ind,change),y=change,fill=ind)) +
+  geom_bar(stat = 'identity') +
+  coord_flip() +
+  scale_fill_discrete(guide = 'none') +
+  labs(
+    title = "% change in number of vacancies per establishment by industry",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Industry",
+    y = "%"
+  ) +
+  theme_classic()
+
+# Industry vacancies per establishment changes
+ind_lab_long |>
+  filter(name == 'vac_per_est') |>
+  group_by(ind_des) |>
+  summarize(
+    change = (last(value) / first (value) - 1) * 100
+  ) |>
+  arrange(-change) |>
+  print()
+```
+
+### Vacancy rate
+
+```{r}
+# Industry vacancies rate trend
+ind_lab_long |>
+  filter(name == 'vac_rate') |>
+  ggplot(aes(x=Date,y=value,colour=ind)) +
+  geom_line() +
+  labs(
+    title = "Vacancy rate by industry",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Date",
+    y = "%",
+    color = 'Industry'
+  ) +
+  theme_classic()
+
+# Industry vacancy rate changes
+ind_lab_long |>
+  filter(name == 'vac_rate') |>
+  group_by(ind) |>
+  summarize(
+    change = (last(value) - first (value))
+  ) |>
+  ggplot(aes(x=reorder(ind,change),y=change,fill=ind)) +
+  geom_bar(stat = 'identity') +
+  coord_flip() +
+  scale_fill_discrete(guide = 'none') +
+  labs(
+    title = "% change in vacancy rate by industry",
+    subtitle = "(2000 - 2026)",
+    caption = "Data from CSD HK",
+    x = "Industry",
+    y = "%"
+  ) +
+  theme_classic()
+
+# Industry vacancy rate changes
+ind_lab_long |>
+  filter(name == 'vac_rate') |>
+  group_by(ind_des) |>
+  summarize(
+    change = (last(value) - first (value))
+  ) |>
+  arrange(-change) |>
+  print()
+```
+
+## Industry share
+
+```{r}
+
 ```
