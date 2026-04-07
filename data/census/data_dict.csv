@@ -1,0 +1,48 @@
+no,field_name,description,field_width,years_available
+1,HHNO,Household serial number,7,"2006, 2011, 2016"
+2,PPN,Person serial number,2,"2006, 2011, 2016"
+3,QRTYP,Type of quarters,1,"2006, 2011, 2016"
+4,HHTYPE,Type of household,1,"2006, 2011, 2016"
+5,TENURE,Tenure of accommodation,1,"2006, 2011, 2016"
+6,RENT,Monthly domestic household rent,2,"2006, 2011, 2016"
+7,MORTHH,Monthly domestic household mortgage payment and loan repayment,2,"2006, 2011, 2016"
+8,YRLEFT,Outstanding period of mortgage payment or loan repayment,1,"2006, 2011, 2016"
+9,UHSIZE,Household size,1,"2006, 2011, 2016"
+10,DJHHINC,Monthly domestic household income,2,"2006, 2011, 2016"
+11,DJHHCOMP,Household composition (old classification),1,"2006, 2011, 2016"
+12,RENT_INC,Rent to income ratio,2,"2006, 2011, 2016"
+13,MORT_INC,Mortgage payment and loan repayment to income ratio,2,"2006, 2011, 2016"
+14,ECONHH,Whether an economically active household,1,"2006, 2011, 2016"
+15,RELAT,Relationship to household head,2,"2006, 2011, 2016"
+16,SSN,Spouse's serial number,2,"2006, 2011, 2016"
+17,PSN,Parent's serial number,2,"2006, 2011, 2016"
+18,SEX,Sex,1,"2006, 2011, 2016"
+19,AGE,Age,3,"2006, 2011, 2016"
+20,MARIT,Marital status,1,"2006, 2011, 2016"
+21,BORNPL,Place of birth,1,"2006, 2011, 2016"
+22,ETHNIC,Ethnicity,2,"2006, 2011, 2016"
+23,NAT,Nationality,2,"2006, 2011, 2016"
+24,DIST,Current district of residence,2,"2006, 2011, 2016"
+25,DUR HK,Duration of residence in Hong Kong,1,"2006, 2011, 2016"
+26,US LANG,Usual spoken language,2,"2006, 2011, 2016"
+27,SCH ATT,School attendance,1,"2006, 2011, 2016"
+28,EDUCN,Educational attainment (highest level attended),1,"2006, 2011, 2016"
+29,STUDYPL,Place of study,2,"2006, 2011, 2016"
+30,ACTIV,Economic activity status,1,"2006, 2011, 2016"
+31,WORKPL,Place of work,2,"2006, 2011, 2016"
+32,MEARN,Monthly income from main employment,2,"2006, 2011, 2016"
+33,WHETWK,Whether working,1,"2006, 2011, 2016"
+34,SFAREAGP1_MT,Floor area of accommodation (in square metres),1,2016 only
+35,SFAREAGP2_MT,Floor area of accommodation (private permanent housing only) (in square metres),1,2016 only
+36,RCHI,Ability to read Chinese,1,2016 only
+37,RENG,Ability to read English,1,2016 only
+38,ROTHERLANG,Ability to read other languages,1,2016 only
+39,WCHI,Ability to write Chinese,1,2016 only
+40,WENG,Ability to write English,1,2016 only
+41,WOTHERLANG,Ability to write other languages,1,2016 only
+42,ALLHOUR,Weekly usual hours of work of all employment,2,2016 only
+43,HHCOMP11,Household composition (new classification),2,"2011, 2016"
+44,INDUST NEW,Industry (HSIC Version 2.0),2,"2011, 2016"
+45,OCCUP_NEW,Occupation (ISCO-08),2,"2011, 2016"
+46,INDUST,Industry (HSIC Version 1.1),2,"2006, 2011"
+47,OCCUP,Occupation (ISCO-88),2,"2006, 2011"
