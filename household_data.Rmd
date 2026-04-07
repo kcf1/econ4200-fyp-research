@@ -33,6 +33,12 @@ library(kableExtra)
 
 ## Data Cleaning
 
+### GDP
+
+```{r}
+
+```
+
 ### Consumption
 
 ```{r}
@@ -66,6 +72,15 @@ cpi$sv <- cpi$sv |>
   )
 cpi <- cpi |> pivot_wider(names_from = sv, values_from = figure)
 cpi <- cpi |> select(period,GROUPDesc,cpi,cpi_a,cpi_b,cpi_c)
+cpi <- cpi |>
+  arrange(period,GROUPDesc) |>
+  group_by(GROUPDesc) |>
+  mutate(
+    cpi = cpi / first(cpi) * 100,
+    cpi_a = cpi_a / first(cpi_a) * 100,
+    cpi_b = cpi_b / first(cpi_b) * 100,
+    cpi_c = cpi_c / first(cpi_c) * 100
+  )
 
 head(cpi)
 ```
@@ -174,7 +189,7 @@ cons |>
   arrange(period,GROUPDesc) |>
   pivot_wider(names_from = period,values_from = HKD) |>
   kable(
-    title = "Monthly household expenditure",
+    caption = "Monthly household expenditure",
     digits = 2
   )
 ```
@@ -277,11 +292,11 @@ cons_cpi |>
   ) +
   labs(
     title = "Nominal expenditure (LHS) vs consumer price (RHS)",
-    subtitle = "Bars as HK$, line as CPI (2019=100), (1999 - 2019)",
+    subtitle = "Bars as HK$, line as CPI (1999=100), (1999 - 2019)",
     caption = "Data from CSD HK",
-    x = "Year"
+    x = "Year",
+    fill = 'Commodity'
   ) +
-  guides(fill = "none") +
   theme_classic()
 
 cons_cpi |>
@@ -294,9 +309,10 @@ cons_cpi |>
     title = "Real household expenditure",
     subtitle = "Real, (1999 - 2019)",
     caption = "Data from CSD HK",
-    x = "Year"
+    x = "Year",
+    y = 'Real',
+    fill = 'Commodity'
   ) +
-  guides(fill = "none") +
   theme_classic()
 
 cons_cpi |>
@@ -319,6 +335,41 @@ cons_cpi |>
   theme(
     axis.text.y = element_text(angle = 30, vjust = 0, hjust = 1)
   )
+
+cons_cpi |>
+  filter(GROUPDesc != 'All goods') |>
+  arrange(GROUPDesc,period) |>
+  ggplot(aes(x=as.numeric(as.character(period)))) +
+  geom_line(aes(y = cpi,color=GROUPDesc),linewidth=1) +
+  geom_point(aes(y = cpi,color=GROUPDesc),shape=4,size=3,stroke=1) +
+  labs(
+    title = "Consumer price level",
+    subtitle = "CPI (1999=100), (1999 - 2019)",
+    caption = "Data from CSD HK",
+    x = "Year",
+    y = "CPI",
+    color = 'Commodity'
+  ) +
+  theme_classic()
+
+cons_cpi |>
+  filter(GROUPDesc != 'All goods') |>
+  arrange(GROUPDesc,period) |>
+  group_by(GROUPDesc) |>
+  summarise(pct_change = last(cpi) / first(cpi) * 100 - 100) |>
+  ggplot() +
+  geom_bar(aes(x=reorder(GROUPDesc,pct_change),y=pct_change,fill=GROUPDesc),color='white',stat='identity',show.legend=FALSE) +
+  coord_flip() +
+  labs(
+    title = "Consumer price level",
+    subtitle = "% change, (1999 - 2019)",
+    caption = "Data from CSD HK",
+    x = "Year",
+    y = "%",
+    color = 'Commodity'
+  ) +
+  theme_classic()
+  
 
 cons_cpi |>
   filter(GROUPDesc != 'All goods') |>
