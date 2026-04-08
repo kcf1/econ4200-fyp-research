@@ -13,30 +13,53 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 # Load the package.
 library(datasets)
-library(dslabs)
 library(tidyr)
 library(stringr)
 library(dplyr)
 library(rvest)
 library(stringr)
 library(lubridate)
-library(janeaustenr)
 library(tidytext)
-library(textdata)
 library(ggplot2)
-library(latex2exp)
 library(knitr)
-library(zoo)
-library(gt)
 library(kableExtra)
 ```
 
 ## Data Cleaning
 
+### Census
+
+```{r}
+census <- read.csv('data/census/census_96_21.csv')
+
+census$QRTYP |> unique()
+
+census |>
+  mutate(
+    period = year |> factor(levels=year|>unique()),
+    LQTYPEDesc = ifelse(QRTYP==9, 4, QRTYP) |> 
+      factor(levels=0:4,labels=c('All housing','Public housing','Subsidised housing','Private housing','Others'))
+  ) |>
+  group_by(period,HHNO) |>
+  summarise(
+    inc_grp = first(DJHHINC),
+    LQTYPEDesc = first(LQTYPEDesc)
+  ) |>
+  group_by(period,LQTYPEDesc) |>
+  summarise(
+    inc_grp = median(inc_grp)
+  ) |>
+  arrange(period,LQTYPEDesc)
+```
+
 ### GDP
 
 ```{r}
-
+gdp <- read.csv('data/household/gdp_pce.csv')
+gdp <- gdp |>
+  pivot_wider(period,names_from=GDP_COMPONENTDesc,values_from = figure)
+colnames(gdp) <- c('period','gdp_y','pce')
+head(gdp)
 ```
 
 ### Consumption
@@ -49,7 +72,7 @@ cons$GROUPDesc <- cons$GROUPDesc |>
          )
 cons$LQTYPEDesc <- ifelse(cons$LQTYPEDesc == 'Total', 'All housing', cons$LQTYPEDesc) |>
   factor(levels=c('All housing','Public housing','Subsidised housing','Private housing'))
-cons$period <- cons$period |> factor(labels=cons$period |> unique())
+#cons$period <- cons$period |> factor(labels=cons$period |> unique())
 cons <- cons |> select(period,GROUPDesc,LQTYPEDesc,figure)
 
 cons |> head()
@@ -64,7 +87,7 @@ cpi$GROUPDesc <- cpi$GROUPDesc |>
   factor(levels=
            c('All goods','Alcoholic drinks and tobacco','Electricity, gas and water','Clothing and footwear','Miscellaneous goods','Durable goods','Transport','Miscellaneous services','Food','Housing')
          )
-cpi$period <- cpi$period |> factor(labels=cpi$period |> unique())
+#cpi$period <- cpi$period |> factor(labels=cpi$period |> unique())
 cpi$sv <- cpi$sv |> 
   factor(
     levels=c('CC_CM_1920','A_CM_1920','B_CM_1920','C_CM_1920'),
@@ -94,7 +117,7 @@ dist$LQTYPEDesc <- dist$LQTYPEDesc |>
     levels=c('Total','Public rental housing','Subsidised home ownership housing','Private permanent housing','Temporary housing'),
     labels=c('All housing','Public housing','Subsidised housing','Private housing','Temporary housing')
     )
-dist$period <- dist$period |> factor(labels=dist$period |> unique())
+#dist$period <- dist$period |> factor(labels=dist$period |> unique())
 dist <- dist |> select(period,LQTYPEDesc,svDesc,figure)
 colnames(dist) <- c('period','LQTYPEDesc','svDesc','number')
 
@@ -110,7 +133,7 @@ size$LQTYPEDesc <- size$LQTYPEDesc |>
     levels=c('Total','Public rental housing','Subsidised home ownership housing','Private permanent housing','Temporary housing'),
     labels=c('All housing','Public housing','Subsidised housing','Private housing','Temporary housing')
     )
-size$period <- size$period |> factor(labels=size$period |> unique())
+#size$period <- size$period |> factor(labels=size$period |> unique())
 size <- size |> select(period,LQTYPEDesc,figure)
 colnames(size) <- c('period','LQTYPEDesc','person')
 
@@ -126,7 +149,7 @@ income$LQTYPEDesc <- income$LQTYPEDesc |>
     levels=c('Total','Public rental housing','Subsidised home ownership housing','Private permanent housing','Temporary housing'),
     labels=c('All housing','Public housing','Subsidised housing','Private housing','Temporary housing')
     )
-income$period <- income$period |> factor(labels=income$period |> unique())
+#income$period <- income$period |> factor(labels=income$period |> unique())
 income$sv <- income$sv |> 
   factor(
     levels=c('MED_DH_INC','MED_DH_INC_XEI'),
@@ -138,6 +161,25 @@ income <- income |> select(period,LQTYPEDesc,inc,inc_eco)
 head(income)
 ```
 
+## Aggregate
+
+```{r}
+gdp |>
+  filter(period <= 2019)# |>
+  mutate(share=pce/gdp_y*100) |>
+  ggplot(aes(x=period)) +
+  geom_line(aes(y=share),color='black',linewidth=1) +
+  geom_point(aes(y=share),color='black',shape=4,size=3,stroke=1) +
+  labs(
+    title = "Private consumption expenditure as share of GDP",
+    subtitle = "%, (1999 - 2019)",
+    caption = "Data from CSD HK",
+    x = "Year",
+    y = "%"
+  ) +
+  theme_classic()
+```
+
 ## All households
 
 ### Absolute changes
@@ -145,11 +187,9 @@ head(income)
 ```{r}
 cons |>
   filter(LQTYPEDesc == 'All housing') |>
-  group_by(period,GROUPDesc) |>
-  summarise(HKD=sum(figure)) |>
   arrange(GROUPDesc,period) |>
   ggplot() +
-  geom_bar(aes(x=period,y=HKD,fill=GROUPDesc),color='white',stat='identity') +
+  geom_bar(aes(x=period,y=figure,fill=GROUPDesc),color='white',stat='identity') +
   labs(
     title = "Monthly household expenditure",
     subtitle = "HK$, (1999 - 2019)",
@@ -162,13 +202,18 @@ cons |>
 
 cons |>
   filter(LQTYPEDesc == 'All housing') |>
-  group_by(period,GROUPDesc) |>
-  summarise(HKD=sum(figure)) |>
+  group_by(period) |>
+  mutate(tot=sum(figure)) |>
   arrange(GROUPDesc,period) |>
   group_by(GROUPDesc) |>
-  summarise(pct_change = last(HKD) / first(HKD) * 100 - 100) |>
+  summarise(
+    pct_change = last(figure) / first(figure) * 100 - 100,
+    tot_pct_change = last(tot) / first(tot) * 100 - 100
+    ) |>
   ggplot() +
   geom_bar(aes(x=reorder(GROUPDesc,pct_change),y=pct_change,fill=GROUPDesc),color='white',stat='identity',show.legend=FALSE) +
+  geom_hline(aes(yintercept = mean(tot_pct_change)), 
+             linetype = 'dashed', color = 'black', linewidth = 1) +
   coord_flip() +
   labs(
     title = "Monthly household expenditure",
@@ -301,23 +346,23 @@ cons_cpi |>
 
 cons_cpi |>
   filter(GROUPDesc != 'All goods') |>
-  mutate(real = figure / cpi) |>
+  mutate(real = figure / cpi * 100) |>
   ggplot(aes(x = as.numeric(as.character(period)))) +
   # Plot consumption normally
   geom_bar(aes(y = real,fill=GROUPDesc), color='white', stat='identity',position='stack') +
   labs(
     title = "Real household expenditure",
-    subtitle = "Real, (1999 - 2019)",
+    subtitle = "HK$ in 1999, (1999 - 2019)",
     caption = "Data from CSD HK",
     x = "Year",
-    y = 'Real',
+    y = 'HK$ in 1999',
     fill = 'Commodity'
   ) +
   theme_classic()
 
 cons_cpi |>
   filter(GROUPDesc != 'All goods') |>
-  mutate(real = figure / cpi) |>
+  mutate(real = figure / cpi * 100) |>
   arrange(GROUPDesc,period) |>
   group_by(GROUPDesc) |>
   summarise(pct_change = last(real) / first(real) * 100 - 100) |>
@@ -373,7 +418,7 @@ cons_cpi |>
 
 cons_cpi |>
   filter(GROUPDesc != 'All goods') |>
-  mutate(real = figure / cpi) |>
+  mutate(real = figure / cpi * 100) |>
   arrange(period,GROUPDesc) |>
   pivot_wider(GROUPDesc,names_from = period,values_from = real) |>
   kable(
@@ -384,14 +429,77 @@ cons_cpi |>
 
 ## By housing type
 
-### Aggregate change
+```{r}
+inc_sampled <- income |>
+  filter(period %in% cons$period)
+
+cons |> merge(inc_sampled, by=c('period','LQTYPEDesc'))
+```
+
+### Income
+
+```{r}
+inc_sampled |>
+  filter(LQTYPEDesc != 'All housing') |>
+  arrange(LQTYPEDesc,period) |>
+  ggplot() +
+  geom_bar(aes(x=period,y=inc,fill=LQTYPEDesc),color='white',stat='identity',position='dodge') +
+  labs(
+    title = "Monthly household income, by housing type",
+    subtitle = "HK$, (2004 - 2019)",
+    caption = "Data from CSD HK",
+    x = "Housing type",
+    y = "HKD",
+    fill = 'Housing type'
+  ) +
+  theme_classic() +
+  theme(
+    axis.text.x = element_text(angle = 30, vjust = 1, hjust = 1)
+  )
+
+inc_sampled |>
+  filter(LQTYPEDesc != 'All housing') |>
+  arrange(LQTYPEDesc,period) |>
+  group_by(LQTYPEDesc) |>
+  summarise(pct_change = last(inc_eco) / first(inc_eco) * 100 - 100) |>
+  ggplot() +
+  geom_bar(aes(x=LQTYPEDesc,y=pct_change,fill=LQTYPEDesc),color='white',stat='identity',show.legend=FALSE) +
+  coord_flip() +
+  labs(
+    title = "Monthly household income, by housing type",
+    subtitle = "% change, (2004 - 2019)",
+    caption = "Data from CSD HK",
+    x = "Housing type",
+    y = "%",
+  ) +
+  theme_classic() +
+  theme(
+    axis.text.y = element_text(angle = 30, vjust = 0, hjust = 1)
+  )
+
+inc_sampled |>
+  filter(LQTYPEDesc != 'All housing') |>
+  arrange(LQTYPEDesc,period) |>
+  pivot_wider(LQTYPEDesc,names_from = period,values_from = inc_eco) |>
+  kable(
+    caption = "Monthly household income, by housing type",
+    digits = 2
+  )
+```
+
+### Saving
+
+```{r}
+
+```
+
+### Expenditure
 
 ```{r}
 cons |>
   filter(LQTYPEDesc != 'All housing') |>
   group_by(period,LQTYPEDesc) |>
   summarise(HKD=sum(figure)) |>
-  arrange(LQTYPEDesc,period) |>
   ggplot() +
   geom_bar(aes(x=period,y=HKD,fill=LQTYPEDesc),color='white',stat='identity',position='dodge') +
   labs(
@@ -400,7 +508,7 @@ cons |>
     caption = "Data from CSD HK",
     x = "Housing type",
     y = "HKD",
-    fill = 'Commodity'
+    fill = 'Housing type'
   ) +
   theme_classic() +
   theme(
