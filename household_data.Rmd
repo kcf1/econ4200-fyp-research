@@ -102,22 +102,22 @@ cons |> head()
 
 ```{r}
 cons_gran <- read.csv('data/household/household_expenditure_granular.csv')
-cons_gran |> mutate(grp_num = str_split_1(GROUPDesc,'.'))
+#cons_gran |> mutate(grp_num = str_split_1(GROUPDesc,'.'))
 
 
 
-cons_gran$GROUPDesc <- cons_gran$GROUPDesc |> 
-  factor(levels=
-           c('Alcoholic drinks and tobacco','Electricity, gas and water','Clothing and footwear','Miscellaneous goods','Durable goods','Transport','Miscellaneous services','Food','Housing')
-         )
+#cons_gran$GROUPDesc <- cons_gran$GROUPDesc |> 
+#  factor(levels=
+#           c('Alcoholic drinks and tobacco','Electricity, gas and water','Clothing and footwear','Miscellaneous goods','Durable goods','Transport','Miscellaneous services','Food','Housing')
+#         )
 
-cons_gran$LQTYPEDesc <- ifelse(cons_gran$LQTYPEDesc == 'Total', 'All housing', cons_gran$LQTYPEDesc) |>
-  factor(levels=c('All housing','Public housing','Subsidised housing','Private housing'))
+#cons_gran$LQTYPEDesc <- ifelse(cons_gran$LQTYPEDesc == 'Total', 'All housing', cons_gran$LQTYPEDesc) |>
+#  factor(levels=c('All housing','Public housing','Subsidised housing','Private housing'))
 #cons_gran$period <- cons_gran$period |> factor(labels=cons_gran$period |> unique())
-cons_gran <- cons_gran |> select(period,GROUPDesc,LQTYPEDesc,figure)
-colnames(cons_gran) <- c('period','goods','housing','expense')
+#cons_gran <- cons_gran |> select(period,GROUPDesc,LQTYPEDesc,figure)
+#colnames(cons_gran) <- c('period','goods','housing','expense')
 
-cons_gran |> head()
+#cons_gran |> head()
 ```
 
 ### Consumer prices
@@ -650,7 +650,7 @@ cons_cpi |>
 inc_sampled <- income |>
   filter(period %in% cons$period)
 
-cons |> merge(inc_sampled, by=c('period','LQTYPEDesc'))
+cons |> merge(inc_sampled, by=c('period','housing'))
 ```
 
 ### Income vs expenditure
@@ -1094,9 +1094,10 @@ all_cons <- hk1 |>
 all_cons |> 
   group_by(country,goods) |>
   summarise(share = mean(share)) |>
-  filter(goods %in% c('Housing','Food')) |>
-  ggplot(aes(x = goods, y = share, fill = country)) +
-  geom_bar(stat='identity',color='white',position='dodge') +
+  filter(goods %in% c('Housing','Food','Transport')) |>
+  mutate(goods = factor(goods, levels=c('Transport','Food','Housing'))) |>
+  ggplot(aes(x = country, y = share, fill = goods)) +
+  geom_bar(stat='identity',color='white',position='stack') +
   #geom_hline(
   #  data = . %>% filter(country != 'Hong Kong') %>% group_by(goods) %>% summarise(mean_shr = mean(share)),
   #  aes(yintercept = mean_shr),
@@ -1109,10 +1110,38 @@ all_cons |>
   #  axis.text.x = element_text(angle = 30, vjust = 0, hjust = 1)
   #) +
   labs(
-    title = "Average shares of expenditure",
+    title = "Average shares of necessities",
     subtitle = "(2009 - 2019)",
     caption = "Data from various sources",
     x = "Country",
     y = "%",
+    fill = 'Goods'
+  )
+
+
+prc_inc <- data.frame(
+  country = factor(1:4,levels=1:4,labels=c('Hong Kong','Singapore','Japan','South Korea')),
+  ratio = c(29.1,23.2,12.2,22.2)
+)
+prc_inc |> 
+  ggplot() +
+  geom_bar(aes(x=country,y=ratio),fill='darkslategray3',color='white',stat='identity') +
+  geom_text(
+    aes(x = country, y = ratio, 
+        label = sprintf("%.0f%%", ratio)
+        ),
+    #hjust = -0.2,  # Adjusts distance from the end of the bar
+    vjust = 2,
+    size = 10,
+    color ='white',
+    fontface = 'bold'
+  ) +
+  theme_custom() +
+  labs(
+    title = "Housing price to income ratio",
+    subtitle = "(2025)",
+    caption = "Data from various sources",
+    x = "Country",
+    y = "%"
   )
 ```
