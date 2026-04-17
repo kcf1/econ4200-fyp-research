@@ -558,6 +558,28 @@ cons_cpi |>
 
 cons_cpi |>
   filter(between(period,1999,2019)) |>
+  filter(housing == 'All housing') |>
+  group_by(period) |>
+  summarise(
+    nominal = sum(expense),
+    ccpi = mean(ccpi)
+  ) |>
+  mutate(
+    real = nominal / ccpi * 100
+  ) |>
+  mutate(
+    qt = real,
+    pt = nominal - real
+  ) |> 
+  pivot_longer(c(qt,pt),names_to='comp',values_to = 'val') |>
+  mutate(comp = factor(comp, levels=c('pt','qt'), labels=c('Price portion','Volume portion'))) |>
+  arrange(period) |>
+  ggplot() +
+  geom_bar(aes(x=period,y=val,fill=comp),color='white',stat='identity',position='stack')
+
+
+cons_cpi |>
+  filter(between(period,1999,2019)) |>
   filter(housing=='All housing') |>
   arrange(goods,period) |>
   group_by(goods) |>

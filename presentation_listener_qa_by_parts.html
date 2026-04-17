@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Listener Q&amp;A Prep — HK Household Expenditure (1999–2019)</title>
+  <style>
+    :root {
+      --text: #1a1a1a;
+      --muted: #5c5c5c;
+      --border: #d4d4d4;
+      --bg: #fafafa;
+      --card: #fff;
+      --accent: #0f4c81;
+      --accent-soft: #e8f0f8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 2rem 1.25rem 3rem;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 1rem;
+      line-height: 1.55;
+      color: var(--text);
+      background: var(--bg);
+    }
+    .wrap {
+      max-width: 52rem;
+      margin: 0 auto;
+    }
+    header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.75rem;
+      color: var(--accent);
+    }
+    .lede {
+      margin: 0;
+      font-size: 1.05rem;
+      color: var(--muted);
+    }
+    h2 {
+      font-size: 1.2rem;
+      margin: 2rem 0 0.75rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text);
+    }
+    h2:first-of-type { border-top: 0; padding-top: 0; margin-top: 1.5rem; }
+    h3 {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin: 1.25rem 0 0.5rem;
+      font-weight: 600;
+    }
+    p { margin: 0.65rem 0; }
+    ul, ol { margin: 0.5rem 0 0.75rem; padding-left: 1.35rem; }
+    li { margin: 0.35rem 0; }
+    hr {
+      border: 0;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      margin: 0.75rem 0 1.25rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 0.65rem 0.85rem;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: var(--accent-soft);
+      font-weight: 600;
+      color: var(--accent);
+      width: 32%;
+    }
+    th + th, td + td { width: 68%; }
+    tr:last-child td { border-bottom: 0; }
+    strong { font-weight: 650; }
+    em { font-style: italic; }
+    .file-note {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    @media print {
+      body { background: #fff; padding: 0; }
+      table { break-inside: avoid; }
+      h2 { break-after: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Listener Q&amp;A Prep: Household Expenditure &amp; Consumption in Hong Kong (1999–2019)</h1>
+      <p class="lede">This note aligns the <strong>presentation script</strong> and <strong>ECON4200 Midterm paper</strong> (Group 4) with <strong>section-by-section key points</strong> and <strong>likely questions, criticisms, and concise answer lines</strong> you can use in Q&amp;A.</p>
+    </header>
+
+    <section>
+      <h2>Part 1 — Opening, roadmap, and framing</h2>
+      <h3>Key points</h3>
+      <ul>
+        <li>Topic: household expenditure and consumption patterns in Hong Kong, 1999–2019.</li>
+        <li>Narrative arc: motivation (macro consumption share) → RQ/objectives → literature → data/methods → results (levels, composition, inflation, housing type, cross-country) → conclusion and next steps.</li>
+      </ul>
+      <h3>Possible questions / answers</h3>
+      <table>
+        <thead>
+          <tr><th>Question / criticism</th><th>How to answer (short)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Why stop at 2019? COVID and post-2019 housing matter.</td>
+            <td>We deliberately use a <strong>pre-pandemic window</strong> so trends are not dominated by one-off shocks; extending the series is a <strong>stated next step</strong> once comparable survey waves exist.</td>
+          </tr>
+          <tr>
+            <td>Private consumption as a share of GDP is aggregate; why does it motivate <em>household</em> work?</td>
+            <td>The macro fact is <strong>motivation</strong>, not the estimand; the <strong>empirical core</strong> is micro household expenditure from C&amp;SD, with macro used for context.</td>
+          </tr>
+          <tr>
+            <td>“Hong Kong is expensive” is obvious; what is new?</td>
+            <td>Contribution is <strong>documentation</strong>: where nominal growth went (housing/food), how much is <strong>inflation vs real</strong>, how patterns <strong>split by housing tenure</strong>, and how HK <strong>benchmarks vs peers</strong>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr />
+
+    <section>
+      <h2>Part 2 — Research question, context, and objectives</h2>
+      <h3>Key points</h3>
+      <ul>
+        <li>Core RQ: <em>What are the key patterns and trends in household expenditure and consumption in Hong Kong from 1999 to 2019?</em></li>
+        <li>Objectives: (1) nominal and real trends; (2) composition by <strong>housing type</strong>; (3) comparison with <strong>Singapore, Japan, South Korea</strong>.</li>
+        <li>Institutional context: market-oriented economy, low tax, limited welfare → consumption and housing constraints differ from regional peers.</li>
+      </ul>
+      <h3>Possible questions / answers</h3>
+      <table>
+        <thead>
+          <tr><th>Question / criticism</th><th>How to answer (short)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>These are descriptive objectives; where is the hypothesis or causal claim?</td>
+            <td>The project is <strong>intentionally descriptive</strong>: we <strong>do not claim causal identification</strong> of policy or prices on behavior; we <strong>map stylized facts</strong> consistent with literature mechanisms.</td>
+          </tr>
+          <tr>
+            <td>Why these three comparator countries only?</td>
+            <td>They are <strong>developed East Asian peers</strong> with available household expenditure statistics; expanding the set is feasible but needs <strong>harmonized definitions and frequency</strong>.</td>
+          </tr>
+          <tr>
+            <td>“Patterns and trends” is broad; how do you bound it?</td>
+            <td>We bound it with <strong>fixed commodity groups</strong>, <strong>housing tenure splits</strong>, <strong>CPI deflation</strong>, and <strong>cross-country budget shares</strong>—each maps to one objective.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr />
+
+    <section>
+      <h2>Part 3 — Literature review</h2>
+      <h3>Key points</h3>
+      <ul>
+        <li>Chai et al. (2024): heterogeneity; budget shares <strong>non-proportional</strong> in income; richer households may <strong>concentrate</strong> spending—supports micro-level analysis.</li>
+        <li>Anker (2011): Engel’s Law benchmark; food share falls with income; <strong>standardize food</strong> (e.g., exclude alcohol/tobacco) when comparing.</li>
+        <li>Ho &amp; Chiu (2002): accessibility/location and <strong>sticky</strong> housing spending; income shapes <strong>housing selection</strong>; public rental can <strong>compress</strong> housing burden vs private market.</li>
+      </ul>
+      <h3>Possible questions / answers</h3>
+      <table>
+        <thead>
+          <tr><th>Question / criticism</th><th>How to answer (short)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Literature is thin / UK-focused / old Ho &amp; Chiu piece.</td>
+            <td>We use three papers as <strong>principles</strong> (heterogeneity, Engel benchmark, HK housing selection), not as a full survey; a longer review is <strong>future work</strong>.</td>
+          </tr>
+          <tr>
+            <td>You cite Engel but then emphasize housing “overriding” Engel-type shifts.</td>
+            <td>Engel helps interpret <strong>food</strong>; HK’s <strong>institutional housing market</strong> can dominate the <strong>budget share</strong> even when food still behaves like a necessity in relative terms.</td>
+          </tr>
+          <tr>
+            <td>Representative agent vs heterogeneity: do you model heterogeneity formally?</td>
+            <td>No—we <strong>document</strong> group differences (housing tenure) and <strong>compare distributions</strong> descriptively; structural modeling is <strong>beyond scope</strong>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr />
+
+    <section>
+      <h2>Part 4 — Data and methodology</h2>
+      <h3>Key points (as in paper/slides)</h3>
+      <ul>
+        <li><strong>Macro</strong>: national income/expenditure, CPI; World Bank + Hong Kong C&amp;SD.</li>
+        <li><strong>Micro</strong>: Hong Kong household expenditure (C&amp;SD), commodity groups (housing, food, transport, durables, etc.).</li>
+        <li><strong>Comparative</strong>: Singapore, Japan, South Korea sources (paper table lists official bureaus; <strong>also</strong> mentions World Population Review in the written deck—be ready to clarify what was actually used for each exhibit).</li>
+        <li><strong>Methods</strong>: descriptive—expenditure vs income (macro/micro), composition, CPI deflation, splits by <strong>public / subsidized / private</strong> housing, international budget-share benchmarks.</li>
+      </ul>
+      <h3>Possible questions / answers</h3>
+      <table>
+        <thead>
+          <tr><th>Question / criticism</th><th>How to answer (short)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Script says “Housing Expenditure Survey” but materials also say general C&amp;SD household expenditure—<strong>which survey exactly</strong>?</td>
+            <td>Use the <strong>exact C&amp;SD survey/module name</strong> from your paper’s data appendix; if the script wording was loose, say <strong>“household expenditure survey data from C&amp;SD”</strong> and cite the official publication.</td>
+          </tr>
+          <tr>
+            <td>Is CPI category-level deflation ideal? Paasche/Laspeyres issues?</td>
+            <td>We use CPI to give a <strong>transparent</strong> real series; ideal deflators can be <strong>category-specific chained indices</strong> where available—acknowledge as a <strong>measurement limitation</strong>.</td>
+          </tr>
+          <tr>
+            <td>Expenditure ≠ consumption (durables, imputed rent, services).</td>
+            <td>True: expenditure is a <strong>practical proxy</strong>; owner-occupied <strong>imputed rent</strong> treatment can move “housing” shares—state whether definitions follow <strong>C&amp;SD conventions</strong> in your tables.</td>
+          </tr>
+          <tr>
+            <td>Selection: housing type is not random; can you say “housing support causes lower spending growth”?</td>
+            <td>We phrase it as <strong>association</strong> consistent with <strong>cost structure</strong> and literature on selection; we avoid <strong>strong causal</strong> language.</td>
+          </tr>
+          <tr>
+            <td>Cross-country comparability: different survey designs and housing tenure systems.</td>
+            <td>Comparisons are <strong>indicative</strong>, not a harmonized micro panel; we focus on <strong>broad budget shares</strong> and <strong>trends</strong>, and flag <strong>definition differences</strong> as a caveat.</td>
+          </tr>
+          <tr>
+            <td>Paper mentions World Population Review—<strong>is that peer-reviewed micro data</strong>?</td>
+            <td>If you used it only for <strong>contextual ratios</strong> (e.g., price-to-income), separate that from <strong>official household surveys</strong>; prefer citing <strong>primary statistical sources</strong> for budget shares.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr />
+
+    <section>
+      <h2>Part 5 — Results: macro vs micro, levels, and composition</h2>
+      <h3>Key points</h3>
+      <ul>
+        <li>Macro: private consumption/GDP rises to ~<strong>70%</strong> by 2019; contrasts with EAP decline and flat world average.</li>
+        <li>Micro nuance: average household expenditure rises after 2010, while <strong>median income</strong> diverges upward in later years → <strong>median consumption-to-income</strong> can look <strong>less aggressive</strong> than averages imply—composition matters.</li>
+        <li>Levels: average monthly household expenditure ~<strong>HK$19k (2005)</strong> to ~<strong>HK$30k (2019)</strong>.</li>
+        <li>Composition: housing <strong>30–40%</strong>, food ~<strong>27%</strong>, miscellaneous services ~<strong>15%</strong>; housing segment largest and growing in stacked bars.</li>
+        <li>Decomposition of <strong>+39%</strong> total (1999–2019 narrative in script): housing contributes largest increment (<strong>~22 ppt of 39</strong>), food <strong>~+11 ppt</strong>, miscellaneous services; <strong>composition shift</strong>: housing share up ~<strong>7 ppt</strong>, food ~<strong>+1 ppt</strong>, other categories lose share → necessities-led reallocation, housing burden intensifies.</li>
+      </ul>
+      <h3>Possible questions / answers</h3>
+      <table>
+        <thead>
+          <tr><th>Question / criticism</th><th>How to answer (short)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Average vs median: which should we trust?</td>
+            <td><strong>Median</strong> for “typical” burden; <strong>average</strong> sensitive to top spenders; your deck already flags <strong>divergence</strong>—say you use both where available.</td>
+          </tr>
+          <tr>
+            <td>“Food share rose only 1% but contributed +11% to growth”—isn’t that confusing?</td>
+            <td><strong>Levels growth</strong> can be large while <strong>share</strong> moves little if <strong>total</strong> rises; <strong>share</strong> answers “budget tilt,” <strong>growth contribution</strong> answers “where dollars went.”</td>
+          </tr>
+          <tr>
+            <td>Miscellaneous services is vague—what’s inside?</td>
+            <td>Answer with the <strong>C&amp;SD category definition</strong> you used (subcomponents listed in your table notes).</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr />
+
+    <section>
+      <h2>Part 6 — Inflation, nominal vs real (internal consistency check)</h2>
+      <h3>Key points (as presented)</h3>
+      <ul>
+        <li>Nominal expenditure <strong>tracks composite CPI</strong> → much of nominal rise is <strong>price-level</strong>.</li>
+        <li>Cumulative price changes (script): food <strong>+71%</strong>, housing <strong>+33%</strong>, durables <strong>−56%</strong>.</li>
+        <li>After deflation: <strong>~+9%</strong> real total (script); housing <strong>+9%</strong> real, durables <strong>+9%</strong> real, food <strong>−4%</strong> real; other categories minor.</li>
+      </ul>
+      <h3>Possible questions / answers</h3>
+      <table>
+        <thead>
+          <tr><th>Question / criticism</th><th>How to answer (short)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Your PDF text</strong> mentions different emphasis (e.g., housing real <strong>+5%</strong> in one slide vs script <strong>+9%</strong>; inflation “explains +30% of +39%”). Which numbers are final?</td>
+            <td><strong>Reconcile before presenting</strong>: pick one deflator base, one commodity CPI mapping, and one aggregation rule; if two slides differ, explain <strong>different subsamples</strong> (e.g., all households vs housing-type subsample) or <strong>update</strong>—listeners will catch arithmetic drift.</td>
+          </tr>
+          <tr>
+            <td>Using headline CPI for all categories understates/overstates category reals.</td>
+            <td>Agree: <strong>category CPI</strong> where possible tightens inference; headline CPI is a <strong>baseline</strong> deflator.</td>
+          </tr>
+          <tr>
+            <td>Real food down: is that undernutrition / welfare loss?</td>
+            <td>Not necessarily—it can reflect <strong>relative prices</strong>, <strong>eating out vs at-home classification</strong>, <strong>quality adjustment</strong>, or <strong>substitution</strong>; welfare needs <strong>quantities/nutrition</strong> data beyond expenditure alone.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr />
+
+    <section>
+      <h2>Part 7 — Results by housing type</h2>
+      <h3>Key points</h3>
+      <ul>
+        <li>Nominal expenditure growth differs: public <strong>~+17%</strong>, subsidized <strong>~+25%</strong>, private <strong>~+39%</strong> (script/paper ballpark).</li>
+        <li>Where subsidization is weaker, households devote a <strong>higher share of income</strong> to consumption expenditure overall—consistent with <strong>housing-driven totals</strong>.</li>
+        <li>Budget shares: private housing housing <strong>~38–44%</strong>; subsidized <strong>~32–40%</strong>; public <strong>~12%</strong> housing share.</li>
+        <li>Dynamics: private + subsidized housing shares <strong>rise</strong> (~<strong>+8</strong> and <strong>+6</strong> ppt over period in script); public tenants see <strong>food share up ~+8 ppt</strong> (housing contained → other necessities more salient).</li>
+        <li>Real (script): subsidized/private still show <strong>real housing spending up</strong>; interpretation: not <strong>purely</strong> a price story—may reflect <strong>quality/location/space</strong> choices with income, but <strong>mechanism not identified</strong> descriptively.</li>
+      </ul>
+      <h3>Possible questions / answers</h3>
+      <table>
+        <thead>
+          <tr><th>Question / criticism</th><th>How to answer (short)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Public housing households are <strong>selected</strong> (income/assets tests); composition differences may be <strong>people</strong>, not “housing support.”</td>
+            <td>Correct: we show <strong>conditional patterns by tenure</strong>; causal attribution needs <strong>controls</strong> (income, age, household size, district)—list as <strong>extension</strong>.</td>
+          </tr>
+          <tr>
+            <td>“Higher income households devote smaller food share” while public food rises—are you contradicting Engel?</td>
+            <td>Public-housing sample mixes <strong>income levels</strong> and <strong>price/availability</strong> constraints; interpret as <strong>tenure-specific budget constraint</strong>, not a universal Engel claim within that subgroup without controls.</td>
+          </tr>
+          <tr>
+            <td>“Crowding out” suggests optimization; do you test a formal budget model?</td>
+            <td>No—<strong>language is economic intuition</strong>; formally testing crowding out needs <strong>prices, wages, savings</strong>, and possibly <strong>credit constraints</strong>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr />
+
+    <section>
+      <h2>Part 8 — Cross-country comparison and “outlier” claims</h2>
+      <h3>Key points</h3>
+      <ul>
+        <li>HK housing share <strong>~30–40%</strong> of household spending vs much lower peers in your charts.</li>
+        <li>Singapore: housing share <strong>~18–24%</strong>, upward but milder; more on education/health/financial services in narrative.</li>
+        <li>Korea: housing share <strong>~8–11%</strong>, flatter; shift toward recreation/health/education.</li>
+        <li>Japan: very stable overall spending; housing <strong>&lt;~8%</strong> share; gradual recreation/health.</li>
+        <li>Combined necessities (housing+food+transport): HK <strong>&gt;~60%</strong> vs peers <strong>&lt;~50%</strong> (script); optional reinforcement with <strong>price-to-income</strong> ratios (ensure <strong>definitions and year</strong> match the statistic you cite).</li>
+      </ul>
+      <h3>Possible questions / answers</h3>
+      <table>
+        <thead>
+          <tr><th>Question / criticism</th><th>How to answer (short)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Japan’s low “housing expenditure share” often reflects <strong>measurement</strong> (imputed rent treatment, renter vs owner, cultural multi-generational housing).</td>
+            <td>We compare <strong>official published household budget shares</strong> consistently, but <strong>interpret cautiously</strong>; Japan may understate market rent burdens depending on survey rules.</td>
+          </tr>
+          <tr>
+            <td>Different <strong>time windows</strong> (Singapore 2002–2022, Korea 2009–2019, Japan 2004–2019) weaken comparison.</td>
+            <td>Acknowledge: exhibits use <strong>available comparable years</strong>; harmonizing <strong>full overlap</strong> is the robustness check to add.</td>
+          </tr>
+          <tr>
+            <td>Why not Taiwan / Mainland cities?</td>
+            <td><strong>Data harmonization and availability</strong>; can be future comparator set if definitions align.</td>
+          </tr>
+          <tr>
+            <td>Price-to-income ratios (2025) vs expenditure shares (to 2019): mixing sources/years.</td>
+            <td>Use <strong>either</strong> as separate evidence; if shown together, label as <strong>different indicators and years</strong> so it is not read as one model.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr />
+
+    <section>
+      <h2>Part 9 — Conclusion, policy, and future research</h2>
+      <h3>Key points</h3>
+      <ul>
+        <li>Nominal spending up, but <strong>real</strong> gains <strong>modest</strong>; <strong>housing and durables</strong> are main real growth areas; food <strong>down</strong> in real terms at aggregate level in your narrative.</li>
+        <li>Tenure lens: <strong>housing burden</strong> is the primary <strong>between-group</strong> difference; <strong>non-housing baskets</strong> more similar once housing is accounted for (careful wording: “conditional patterns,” not “controlled” in a regression sense unless you ran controls).</li>
+        <li>HK is a <strong>regional outlier</strong> in housing’s budget share and affordability indicators in your storyline.</li>
+        <li>Next steps: drivers of <strong>real housing consumption</strong> (atomization, demographics, family structure); <strong>macro shocks</strong> transmission to households; <strong>policy learning</strong> from peer housing schemes—<strong>descriptive</strong> paper stops short of policy evaluation.</li>
+      </ul>
+      <h3>Possible questions / answers</h3>
+      <table>
+        <thead>
+          <tr><th>Question / criticism</th><th>How to answer (short)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Policy recommendation is generic (“refine programs”). What <strong>specific</strong> lever?</td>
+            <td>We point to <strong>peer schemes as case studies</strong>; <strong>cost–benefit and incidence analysis</strong> is outside this midterm’s scope but is the right follow-on.</td>
+          </tr>
+          <tr>
+            <td>Could public housing expansion <strong>distort</strong> market signals / fiscal costs?</td>
+            <td>Reasonable debate; our paper <strong>documents burdens</strong> by tenure; full policy analysis needs <strong>general equilibrium</strong> and <strong>fiscal incidence</strong>.</td>
+          </tr>
+          <tr>
+            <td>What about <strong>wealth/income inequality</strong> driving averages?</td>
+            <td>Important: inequality can <strong>separate mean vs median</strong> paths; extending to <strong>percentiles</strong> is a natural robustness extension.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr />
+
+    <section>
+      <h2>Quick “gotcha” checklist (before you present)</h2>
+      <ol>
+        <li><strong>Align all headline numbers</strong> across slides/script/PDF (especially <strong>real totals</strong> and <strong>real housing</strong> growth).</li>
+        <li><strong>Name the exact C&amp;SD source</strong> for micro tables (official survey/module title and years).</li>
+        <li><strong>Clarify comparative data provenance</strong> (primary statistical agencies vs any secondary compilation).</li>
+        <li>Pre-write one sentence: <strong>“Descriptive stylized facts; not causal estimates.”</strong></li>
+        <li>Pre-write one sentence on <strong>cross-country definitions</strong> and <strong>imputed rent</strong> caveat for Japan/HK comparisons.</li>
+      </ol>
+    </section>
+
+    <hr />
+
+    <p class="file-note"><strong>File note.</strong> Prepared from: in-repo <code>midterm_summary_and_script.md</code>, the user-provided slide script, and extracted text from <code>ECON4200 Midterm.pdf</code> (Group 4, 28 slides).</p>
+  </div>
+</body>
+</html>
